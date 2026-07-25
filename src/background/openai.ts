@@ -1,16 +1,27 @@
 import type { Provider } from "../shared/types";
-import type { EngineRequest, TranslateResult } from "./engine";
+import { userPayload, type EngineRequest, type TranslateResult } from "./engine";
 import { requestWithRetry } from "./http";
 import { OUTPUT_SCHEMA, systemPrompt } from "./prompt";
 
 type CompatProvider = Exclude<Provider, "anthropic">;
 
-const BASES: Record<CompatProvider, string> = {
+const BASES: Partial<Record<CompatProvider, string>> = {
   openai: "https://api.openai.com/v1",
   grok: "https://api.x.ai/v1",
   deepseek: "https://api.deepseek.com/v1",
   gemini: "https://generativelanguage.googleapis.com/v1beta/openai",
 };
+
+function resolveBase(provider: CompatProvider, baseUrl?: string): string {
+  const base = provider === "custom" ? baseUrl : BASES[provider];
+  if (!base) throw new Error("请先在设置中填写自定义接口地址");
+  return base.replace(/\/+$/, "");
+}
+
+function authHeaders(apiKey: string): Record<string, string> {
+  // 本地端点(Ollama 等)不需要 key,留空则不带 authorization
+  return apiKey ? { authorization: `Bearer ${apiKey}` } : {};
+}
 
 export async function translateOpenAICompat(
   provider: CompatProvider,
@@ -19,12 +30,12 @@ export async function translateOpenAICompat(
   const body = {
     model: req.model,
     messages: [
-      { role: "system", content: systemPrompt(req.targetLang) },
-      { role: "user", content: JSON.stringify({ segments: req.items }) },
+      { role: "system", content: systemPrompt(req.targetLang, req.glossary) },
+      { role: "user", content: userPayload(req) },
     ],
-    // DeepSeek 不支持 json_schema,靠 json_object + 提示词里的形状约束
+    // DeepSeek 不支持 json_schema;自定义端点能力未知,也走宽松的 json_object
     response_format:
-      provider === "deepseek"
+      provider === "deepseek" || provider === "custom"
         ? { type: "json_object" }
         : {
             type: "json_schema",
@@ -32,13 +43,16 @@ export async function translateOpenAICompat(
           },
   };
 
-  const data = await requestWithRetry(`${BASES[provider]}/chat/completions`, {
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${req.apiKey}`,
+  const data = await requestWithRetry(
+    `${resolveBase(provider, req.baseUrl)}/chat/completions`,
+    {
+      headers: {
+        "content-type": "application/json",
+        ...authHeaders(req.apiKey),
+      },
+      body,
     },
-    body,
-  });
+  );
 
   const choice = data.choices?.[0];
   if (!choice?.message) throw new Error("API 响应中没有内容");
@@ -65,10 +79,11 @@ export async function translateOpenAICompat(
 export async function pingOpenAICompat(
   provider: CompatProvider,
   apiKey: string,
+  baseUrl?: string,
 ): Promise<void> {
   await requestWithRetry(
-    `${BASES[provider]}/models`,
-    { method: "GET", headers: { authorization: `Bearer ${apiKey}` } },
+    `${resolveBase(provider, baseUrl)}/models`,
+    { method: "GET", headers: authHeaders(apiKey) },
     0,
   );
 }

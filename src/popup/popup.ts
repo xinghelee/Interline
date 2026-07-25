@@ -15,6 +15,7 @@ const translateBtn = $<HTMLButtonElement>("translate");
 const toggleBtn = $<HTMLButtonElement>("toggle");
 const toggleOriginalBtn = $<HTMLButtonElement>("toggleOriginal");
 const clearBtn = $<HTMLButtonElement>("clear");
+const retryBtn = $<HTMLButtonElement>("retry");
 const statusEl = $("status");
 const usageEl = $("usage");
 const progressWrap = $("progressWrap");
@@ -102,6 +103,11 @@ async function init(): Promise<void> {
     const next = await sendToContent({ type: "toggleOriginal" });
     if (next) applyState(next);
   });
+  retryBtn.addEventListener("click", async () => {
+    const next = await sendToContent({ type: "retryFailed" });
+    if (next) applyState(next);
+    startPolling();
+  });
   clearBtn.addEventListener("click", async () => {
     const next = await sendToContent({ type: "removeAll" });
     if (next) applyState(next);
@@ -127,6 +133,9 @@ function applyState(state: ContentState): void {
   clearBtn.classList.toggle("hidden", !hasBlocks);
   toggleBtn.textContent = state.shown ? "隐藏译文" : "显示译文";
   toggleOriginalBtn.textContent = state.originalShown ? "仅译文" : "显示原文";
+
+  retryBtn.classList.toggle("hidden", busy || state.failedCount === 0);
+  retryBtn.textContent = `重试失败段落(${state.failedCount})`;
 
   progressWrap.classList.toggle("hidden", !busy);
   progressBar.style.width =

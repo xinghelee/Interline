@@ -6,6 +6,7 @@ export const DEFAULT_MODELS: Record<Provider, string> = {
   grok: "grok-4-fast-non-reasoning",
   deepseek: "deepseek-v4-flash",
   gemini: "gemini-2.5-flash",
+  custom: "qwen3:8b",
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -18,7 +19,10 @@ export const DEFAULT_SETTINGS: Settings = {
   autoSites: [],
   selectionEnabled: true,
   showOriginal: true,
+  siteShowOriginal: {},
   adBlock: true,
+  customBaseUrl: "",
+  glossary: "",
 };
 
 export function activeKey(s: Settings): string {
@@ -40,6 +44,7 @@ export async function getSettings(): Promise<Settings> {
     ...stored,
     apiKeys: { ...stored.apiKeys },
     models: { ...stored.models },
+    siteShowOriginal: { ...stored.siteShowOriginal },
   };
   // v0.1 只有 Claude 单 key/model 字段,迁移进 map
   if (stored.apiKey && !settings.apiKeys.anthropic) {

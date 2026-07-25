@@ -1,4 +1,10 @@
-export type Provider = "anthropic" | "openai" | "grok" | "deepseek" | "gemini";
+export type Provider =
+  | "anthropic"
+  | "openai"
+  | "grok"
+  | "deepseek"
+  | "gemini"
+  | "custom";
 
 export interface Settings {
   /** 当前使用的翻译服务商 */
@@ -15,10 +21,16 @@ export interface Settings {
   autoSites: string[];
   /** 划词翻译开关 */
   selectionEnabled: boolean;
-  /** 是否显示原文(关 = 仅译文模式),记住用户上次的选择 */
+  /** 是否显示原文(关 = 仅译文模式),新站点的默认值 */
   showOriginal: boolean;
+  /** 按站点记忆的原文显示偏好,覆盖全局默认 */
+  siteShowOriginal: Record<string, boolean>;
   /** 屏蔽常见广告(内置域名规则 + 版位遮蔽) */
   adBlock: boolean;
+  /** 自定义 OpenAI 兼容端点地址(provider = custom 时用) */
+  customBaseUrl: string;
+  /** 术语表,每行"原文=译文" */
+  glossary: string;
 }
 
 export interface SegmentItem {
@@ -28,8 +40,18 @@ export interface SegmentItem {
 
 // ---- content/popup → background ----
 
+export interface TranslateContext {
+  /** 页面标题,仅用于消歧,不翻译 */
+  title?: string;
+}
+
 export type BackgroundRequest =
-  | { type: "translateBatch"; items: SegmentItem[]; targetLang?: string }
+  | {
+      type: "translateBatch";
+      items: SegmentItem[];
+      targetLang?: string;
+      context?: TranslateContext;
+    }
   | { type: "getUsage" }
   | { type: "testConnection" }
   | { type: "getCacheStats" }
@@ -65,7 +87,8 @@ export type ContentRequest =
   | { type: "toggleTranslate" }
   | { type: "toggleSelection" }
   | { type: "toggleOriginal" }
-  | { type: "translateInput" };
+  | { type: "translateInput" }
+  | { type: "retryFailed" };
 
 export interface ContentState {
   state: "idle" | "translating" | "done";
@@ -74,6 +97,8 @@ export interface ContentState {
   originalShown: boolean;
   total: number;
   completed: number;
+  /** 翻译失败待重试的段落数 */
+  failedCount: number;
   error?: string;
   /** 当前页面 hostname,popup 的站点开关用(popup 无 tabs 权限读不到 URL) */
   host: string;

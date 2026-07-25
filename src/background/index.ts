@@ -4,6 +4,7 @@ import type {
   CacheStats,
   TestConnectionResponse,
   TranslateBatchResponse,
+  TranslateContext,
 } from "../shared/types";
 import {
   cacheClear,
@@ -19,7 +20,7 @@ chrome.runtime.onMessage.addListener(
   (msg: BackgroundRequest | undefined, _sender, sendResponse) => {
     switch (msg?.type) {
       case "translateBatch":
-        handleTranslateBatch(msg.items, msg.targetLang)
+        handleTranslateBatch(msg.items, msg.targetLang, msg.context)
           .then(sendResponse)
           .catch((e) =>
             sendResponse({ ok: false, error: errorMessage(e) } satisfies TranslateBatchResponse),
@@ -92,12 +93,20 @@ chrome.commands.onCommand.addListener(async (command) => {
 async function handleTranslateBatch(
   items: { id: number; text: string }[],
   targetLangOverride?: string,
+  context?: TranslateContext,
 ): Promise<TranslateBatchResponse> {
   const settings = await getSettings();
-  if (!activeKey(settings)) return { ok: false, error: "尚未设置 API Key" };
+  // 自定义端点(本地模型)可以没有 key
+  if (!activeKey(settings) && settings.provider !== "custom") {
+    return { ok: false, error: "尚未设置 API Key" };
+  }
+  if (settings.provider === "custom" && !settings.customBaseUrl) {
+    return { ok: false, error: "请先在设置中填写自定义接口地址" };
+  }
 
   const target = targetLangOverride ?? settings.targetLang;
-  const cacheScope = `${settings.provider}/${activeModel(settings)}`;
+  // 术语表影响译文,纳入缓存 key;页面标题只是消歧线索,刻意不纳入
+  const cacheScope = `${settings.provider}/${activeModel(settings)}#${settings.glossary}`;
 
   const translations: Record<number, string> = {};
   const keyById = new Map<number, string>();
@@ -118,7 +127,7 @@ async function handleTranslateBatch(
   }
 
   if (misses.length > 0) {
-    const result = await translate(misses, settings, targetLangOverride);
+    const result = await translate(misses, settings, targetLangOverride, context);
     await recordUsage(
       result.model,
       result.usage.input_tokens,
@@ -141,7 +150,9 @@ async function handleTranslateBatch(
 
 async function handleTestConnection(): Promise<TestConnectionResponse> {
   const settings = await getSettings();
-  if (!activeKey(settings)) return { ok: false, error: "尚未设置 API Key" };
+  if (!activeKey(settings) && settings.provider !== "custom") {
+    return { ok: false, error: "尚未设置 API Key" };
+  }
   await ping(settings);
   return { ok: true };
 }

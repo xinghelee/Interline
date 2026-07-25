@@ -80,6 +80,7 @@ label > span {
 
 input[type="password"],
 input[type="text"],
+textarea,
 select {
   font: inherit;
   padding: 7px 10px;
@@ -156,4 +157,18 @@ button.primary {
 #testResult.ok,
 #saveResult.ok {
   color: #0a8754;
+}
+
+#saveResult.error {
+  color: #d0453b;
+}
+
+textarea {
+  resize: vertical;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+}
+
+.hidden {
+  display: none !important;
 }

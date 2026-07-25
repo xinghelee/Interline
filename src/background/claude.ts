@@ -1,4 +1,4 @@
-import type { EngineRequest, TranslateResult } from "./engine";
+import { userPayload, type EngineRequest, type TranslateResult } from "./engine";
 import { requestWithRetry } from "./http";
 import { OUTPUT_SCHEMA, systemPrompt } from "./prompt";
 
@@ -23,10 +23,15 @@ export async function translateClaude(req: EngineRequest): Promise<TranslateResu
   const body = {
     model: req.model,
     max_tokens: maxTokens,
-    system: systemPrompt(req.targetLang),
-    messages: [
-      { role: "user", content: JSON.stringify({ segments: req.items }) },
+    // system 前缀稳定(仅随目标语言/术语表变),标记为可缓存
+    system: [
+      {
+        type: "text",
+        text: systemPrompt(req.targetLang, req.glossary),
+        cache_control: { type: "ephemeral" },
+      },
     ],
+    messages: [{ role: "user", content: userPayload(req) }],
     output_config: { format: { type: "json_schema", schema: OUTPUT_SCHEMA } },
   };
 

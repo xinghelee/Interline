@@ -19,7 +19,17 @@
           <option value="grok">Grok(xAI)</option>
           <option value="deepseek">DeepSeek</option>
           <option value="gemini">Gemini(Google)</option>
+          <option value="custom">自定义(OpenAI 兼容)</option>
         </select>
+      </label>
+      <label id="baseUrlRow" class="hidden">
+        <span>接口地址</span>
+        <input
+          id="customBaseUrl"
+          type="text"
+          placeholder="如 http://localhost:11434/v1(Ollama)"
+          autocomplete="off"
+        />
       </label>
       <label>
         <span>API Key</span>
@@ -46,6 +56,14 @@
           <option value="English">English</option>
           <option value="日本語">日本語</option>
         </select>
+      </label>
+      <label>
+        <span>术语表(每行一条,格式:原文=译文)</span>
+        <textarea
+          id="glossary"
+          rows="4"
+          placeholder="agent=智能体&#10;prompt=提示词"
+        ></textarea>
       </label>
       <label class="inline">
         <input id="selectionEnabled" type="checkbox" />

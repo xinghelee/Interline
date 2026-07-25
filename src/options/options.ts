@@ -15,12 +15,16 @@ const MODEL_SUGGESTIONS: Record<Provider, string[]> = {
   grok: ["grok-4-fast-non-reasoning", "grok-4"],
   deepseek: ["deepseek-v4-flash", "deepseek-v4-pro"],
   gemini: ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro"],
+  custom: ["qwen3:8b", "gpt-oss:20b", "gemma3:12b"],
 };
 
 const $ = <T extends HTMLElement>(id: string) =>
   document.getElementById(id) as T;
 
 const providerEl = $<HTMLSelectElement>("provider");
+const baseUrlRowEl = $("baseUrlRow");
+const customBaseUrlEl = $<HTMLInputElement>("customBaseUrl");
+const glossaryEl = $<HTMLTextAreaElement>("glossary");
 const apiKeyEl = $<HTMLInputElement>("apiKey");
 const modelEl = $<HTMLInputElement>("model");
 const modelChipsEl = $<HTMLElement>("modelChips");
@@ -47,6 +51,8 @@ async function init(): Promise<void> {
   currentProvider = settings.provider;
 
   providerEl.value = currentProvider;
+  customBaseUrlEl.value = settings.customBaseUrl;
+  glossaryEl.value = settings.glossary;
   targetLangEl.value = settings.targetLang;
   styleColorEl.value = settings.styleColor;
   underlineEl.checked = settings.underline;
@@ -99,6 +105,11 @@ function stashProviderFields(): void {
 function loadProviderFields(): void {
   apiKeyEl.value = apiKeys[currentProvider] ?? "";
   modelEl.value = models[currentProvider] || DEFAULT_MODELS[currentProvider];
+  baseUrlRowEl.classList.toggle("hidden", currentProvider !== "custom");
+  apiKeyEl.placeholder =
+    currentProvider === "custom"
+      ? "本地端点可留空"
+      : "当前服务商的 API Key";
   renderModelChips();
 }
 
@@ -121,16 +132,33 @@ function renderModelChips(): void {
 
 async function save(): Promise<void> {
   stashProviderFields();
+  const customBaseUrl = customBaseUrlEl.value.trim().replace(/\/+$/, "");
   await saveSettings({
     provider: currentProvider,
     apiKeys: { ...apiKeys },
     models: { ...models },
+    customBaseUrl,
+    glossary: glossaryEl.value.trim(),
     targetLang: targetLangEl.value,
     styleColor: styleColorEl.value,
     underline: underlineEl.checked,
     selectionEnabled: selectionEnabledEl.checked,
     adBlock: adBlockEl.checked,
   });
+  // 自定义端点是任意域名,需要动态申请 host 权限(必须在用户手势里)
+  if (currentProvider === "custom" && customBaseUrl) {
+    try {
+      const origin = new URL(customBaseUrl).origin + "/*";
+      const granted = await chrome.permissions.request({ origins: [origin] });
+      if (!granted) {
+        saveResultEl.textContent = "已保存,但未授予接口地址的访问权限";
+        saveResultEl.className = "error";
+      }
+    } catch {
+      saveResultEl.textContent = "接口地址格式不对,需要完整 URL";
+      saveResultEl.className = "error";
+    }
+  }
 }
 
 async function refreshCacheInfo(): Promise<void> {

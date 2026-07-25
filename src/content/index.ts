@@ -38,6 +38,7 @@ const state: ContentState = {
   originalShown: true,
   total: 0,
   completed: 0,
+  failedCount: 0,
   host: location.hostname,
 };
 
@@ -53,6 +54,8 @@ let flushTimer: number | undefined;
 let rescanTimer: number | undefined;
 // 每轮只 toast 一次失败,避免连续失败刷屏
 let errorToasted = false;
+// 翻译失败待重试的段落
+let failedSegs: Segment[] = [];
 
 chrome.runtime.onMessage.addListener(
   (msg: ContentRequest, _sender, sendResponse) => {
@@ -94,13 +97,32 @@ chrome.runtime.onMessage.addListener(
           state.shown = true;
           document.documentElement.classList.remove("interline-hide");
         }
-        void saveSettings({ showOriginal: state.originalShown });
+        // 按站点记忆偏好(全局默认保持不变)
+        void (async () => {
+          const s = await getSettings();
+          await saveSettings({
+            siteShowOriginal: {
+              ...s.siteShowOriginal,
+              [location.hostname]: state.originalShown,
+            },
+          });
+        })();
         sendResponse(state);
         break;
       case "translateInput":
         void translateActiveInput();
         sendResponse(state);
         break;
+      case "retryFailed": {
+        const retry = failedSegs.filter((s) => s.el.isConnected);
+        failedSegs = [];
+        state.failedCount = 0;
+        state.error = undefined;
+        errorToasted = false;
+        if (retry.length > 0) enqueue(retry);
+        sendResponse(state);
+        break;
+      }
       case "toggleSelection": {
         const next = !isSelectionEnabled();
         setSelectionEnabled(next);
@@ -120,8 +142,9 @@ async function start(): Promise<void> {
   state.error = undefined;
   errorToasted = false;
 
-  // 沿用上次的原文显示偏好
-  state.originalShown = settings.showOriginal;
+  // 原文显示偏好:站点记忆优先,全局值作新站点默认
+  state.originalShown =
+    settings.siteShowOriginal[location.hostname] ?? settings.showOriginal;
   document.documentElement.classList.toggle(
     "interline-hide-original",
     !state.originalShown,
@@ -150,6 +173,8 @@ function stop(): void {
 
   removeAllTranslations();
   document.documentElement.classList.remove("interline-hide-original");
+  failedSegs = [];
+  state.failedCount = 0;
   state.state = "idle";
   state.shown = true;
   state.originalShown = true;
@@ -284,7 +309,11 @@ async function runBatch(batch: Segment[], gen: number): Promise<void> {
   const items: SegmentItem[] = batch.map(({ id, text }) => ({ id, text }));
   let resp: TranslateBatchResponse;
   try {
-    resp = await chrome.runtime.sendMessage({ type: "translateBatch", items });
+    resp = await chrome.runtime.sendMessage({
+      type: "translateBatch",
+      items,
+      context: { title: document.title },
+    });
   } catch (e) {
     resp = { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
@@ -293,6 +322,8 @@ async function runBatch(batch: Segment[], gen: number): Promise<void> {
   if (!resp?.ok) {
     state.error = resp?.error ?? "翻译请求失败";
     state.completed += batch.length;
+    failedSegs.push(...batch);
+    state.failedCount = failedSegs.length;
     for (const seg of batch) removePending(seg.el);
     if (!errorToasted) {
       errorToasted = true;
