@@ -75,7 +75,9 @@ chrome.commands.onCommand.addListener(async (command) => {
       ? ("toggleTranslate" as const)
       : command === "toggle-selection"
         ? ("toggleSelection" as const)
-        : null;
+        : command === "translate-input"
+          ? ("translateInput" as const)
+          : null;
   if (!type) return;
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

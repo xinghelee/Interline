@@ -64,7 +64,8 @@ export type ContentRequest =
   | { type: "getState" }
   | { type: "toggleTranslate" }
   | { type: "toggleSelection" }
-  | { type: "toggleOriginal" };
+  | { type: "toggleOriginal" }
+  | { type: "translateInput" };
 
 export interface ContentState {
   state: "idle" | "translating" | "done";

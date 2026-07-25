@@ -9,6 +9,7 @@ import type {
 import { collectSegments, type Segment } from "./scan";
 import { removeAllTranslations, renderTranslation } from "./render";
 import { setupAdClean } from "./adclean";
+import { translateActiveInput } from "./inputtranslate";
 import {
   isSelectionEnabled,
   setSelectionEnabled,
@@ -86,6 +87,10 @@ chrome.runtime.onMessage.addListener(
           document.documentElement.classList.remove("interline-hide");
         }
         void saveSettings({ showOriginal: state.originalShown });
+        sendResponse(state);
+        break;
+      case "translateInput":
+        void translateActiveInput();
         sendResponse(state);
         break;
       case "toggleSelection": {

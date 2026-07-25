@@ -44,16 +44,20 @@ export function setupSelectionTranslate(initial: boolean): void {
   window.addEventListener("scroll", hideAll, { passive: true, capture: true });
 }
 
-export function showSelectionToast(on: boolean): void {
+export function showToast(text: string): void {
   if (!toast) {
     toast = document.createElement("div");
     toast.className = "interline-ui interline-toast";
     document.documentElement.appendChild(toast);
   }
-  toast.textContent = on ? "划词翻译:开" : "划词翻译:关";
+  toast.textContent = text;
   toast.classList.remove("interline-hidden");
   if (toastTimer !== undefined) clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => toast?.classList.add("interline-hidden"), 1500);
+  toastTimer = window.setTimeout(() => toast?.classList.add("interline-hidden"), 1600);
+}
+
+export function showSelectionToast(on: boolean): void {
+  showToast(on ? "划词翻译:开" : "划词翻译:关");
 }
 
 function maybeShowButton(): void {

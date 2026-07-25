@@ -108,6 +108,9 @@ html.interline-adblock div[id^="google_ads_"],
 html.interline-adblock [id^="div-gpt-ad"],
 html.interline-adblock [data-ad-slot],
 html.interline-adblock iframe[src*="doubleclick.net"],
-html.interline-adblock iframe[src*="googlesyndication.com"] {
+html.interline-adblock iframe[src*="googlesyndication.com"],
+html.interline-adblock shreddit-ad-post,
+html.interline-adblock shreddit-comment-tree-ad,
+html.interline-adblock shreddit-dynamic-ad-link {
   display: none !important;
 }

@@ -55,6 +55,7 @@ export function collectSegments(targetLang: string): Segment[] {
     if (text.length < (isLeafDiv ? MIN_DIV_CHARS : MIN_CHARS)) continue;
     if (text.length > MAX_CHARS) continue;
     if (!/\p{L}/u.test(text)) continue;
+    if (/^https?:\/\/\S+$/i.test(text)) continue; // 纯链接不翻
     if (looksLikeTargetLang(text, targetLang)) continue;
 
     picked.push({ el, text });

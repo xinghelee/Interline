@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Interline 行间",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "双语对照网页翻译:译文长在字里行间。自用 API,无订阅无遥测。",
   "permissions": ["storage", "declarativeNetRequest"],
   "declarative_net_request": {
@@ -43,6 +43,10 @@
     "toggle-selection": {
       "suggested_key": { "default": "Alt+S" },
       "description": "开关划词翻译"
+    },
+    "translate-input": {
+      "suggested_key": { "default": "Alt+E" },
+      "description": "翻译当前输入框内容(原地替换)"
     }
   }
 }
