@@ -3,8 +3,7 @@
 个人用双语对照浏览器翻译扩展:译文长在字里行间。支持 Claude / OpenAI / Grok / DeepSeek / Gemini 及自定义 OpenAI 兼容端点,自带 API Key,无订阅无遥测。设计与路线图见 [PLAN.md](./PLAN.md)。
 
 <p align="center">
-  <img src="docs/popup.png" width="330" alt="Popup:翻译此页、站点自动翻译、当日用量、快捷翻译" />
-  <img src="docs/options.png" width="330" alt="设置页:翻译服务、模型、术语表、样式、缓存" />
+  <img src="docs/banner.png" alt="行间:popup 与设置页" />
 </p>
 
 ## 开发
