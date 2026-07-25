@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Interline 行间",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "双语对照网页翻译:译文长在字里行间。自用 API,无订阅无遥测。",
   "icons": {
     "16": "icons/icon16.png",

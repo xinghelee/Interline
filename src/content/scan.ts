@@ -18,6 +18,20 @@ const BLOCK_INSIDE =
 const SKIP_CLOSEST =
   "pre, code, kbd, samp, nav, form, textarea, select, [contenteditable='true'], svg, .interline-block, .interline-ui";
 
+// 站点级排除区域:UI 密集、翻了只添乱的部分(侧栏、用户卡片、趋势)
+const SITE_SKIP: { pattern: RegExp; selector: string }[] = [
+  {
+    pattern: /(^|\.)(x|twitter)\.com$/,
+    selector:
+      "[data-testid='sidebarColumn'], [data-testid='UserCell'], [data-testid='trend']",
+  },
+];
+
+const skipSelector = (() => {
+  const extra = SITE_SKIP.find((s) => s.pattern.test(location.hostname));
+  return extra ? `${SKIP_CLOSEST}, ${extra.selector}` : SKIP_CLOSEST;
+})();
+
 // div 叶子块额外跳过可交互控件,避免翻译按钮/菜单文案
 const DIV_SKIP_CLOSEST =
   "a, button, label, [role='button'], [role='tab'], [role='menuitem'], [role='option']";
@@ -43,7 +57,7 @@ export function collectSegments(targetLang: string): Segment[] {
     // (如 h2 翻过后,内部的叶子 div 又够到字符门槛)
     if (el.closest("[data-interline-id]")) continue;
     if (el.querySelector("[data-interline-id]")) continue;
-    if (el.closest(SKIP_CLOSEST)) continue;
+    if (el.closest(skipSelector)) continue;
 
     const isLeafDiv = el.tagName === "DIV" && !el.matches(CANDIDATE_SELECTOR);
     if (isLeafDiv) {
