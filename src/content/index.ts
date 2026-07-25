@@ -8,6 +8,7 @@ import type {
 } from "../shared/types";
 import { collectSegments, type Segment } from "./scan";
 import { removeAllTranslations, renderTranslation } from "./render";
+import { setupAdClean } from "./adclean";
 import {
   isSelectionEnabled,
   setSelectionEnabled,
@@ -274,10 +275,11 @@ async function runBatch(batch: Segment[], gen: number): Promise<void> {
   }
 }
 
-// 初始化:划词翻译 + 广告版位遮蔽 + 站点自动翻译
+// 初始化:划词翻译 + 广告清理 + 站点自动翻译
 void (async () => {
   const s = await getSettings();
   setupSelectionTranslate(s.selectionEnabled);
   document.documentElement.classList.toggle("interline-adblock", s.adBlock);
+  if (s.adBlock) setupAdClean();
   if (s.autoSites.includes(location.hostname)) void start();
 })();
