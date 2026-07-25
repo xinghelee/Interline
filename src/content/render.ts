@@ -15,6 +15,10 @@ export function renderTranslation(
   const cs = getComputedStyle(el);
   node.style.setProperty("font-size", cs.fontSize, "important");
   node.style.setProperty("line-height", cs.lineHeight, "important");
+  // X 等站点只给最内层 span 设字体,容器落在浏览器默认衬线体上,兜底成系统字体
+  if (/^(-webkit-standard|Times)/i.test(cs.fontFamily)) {
+    node.style.fontFamily = 'system-ui, -apple-system, "PingFang SC", sans-serif';
+  }
   if (settings.styleColor) {
     node.style.color = settings.styleColor;
     node.style.opacity = "1";

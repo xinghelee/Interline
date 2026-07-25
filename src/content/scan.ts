@@ -39,6 +39,10 @@ export function collectSegments(targetLang: string): Segment[] {
 
   for (const el of candidates) {
     if (el.dataset.interlineId) continue;
+    // 祖先或后代已翻译过的都跳过,否则同一段文字会被翻两遍
+    // (如 h2 翻过后,内部的叶子 div 又够到字符门槛)
+    if (el.closest("[data-interline-id]")) continue;
+    if (el.querySelector("[data-interline-id]")) continue;
     if (el.closest(SKIP_CLOSEST)) continue;
 
     const isLeafDiv = el.tagName === "DIV" && !el.matches(CANDIDATE_SELECTOR);

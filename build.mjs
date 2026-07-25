@@ -14,8 +14,9 @@ const copies = [
   ["src/options/options.html", "dist/options.html"],
   ["src/options/options.css", "dist/options.css"],
   ["src/adblock/rules.json", "dist/adrules.json"],
+  ["src/assets/icons", "dist/icons"],
 ];
-for (const [from, to] of copies) cpSync(from, to);
+for (const [from, to] of copies) cpSync(from, to, { recursive: true });
 
 /** @type {import("esbuild").BuildOptions} */
 const options = {
