@@ -194,6 +194,16 @@ function hasRelevantAddition(m: MutationRecord): boolean {
 /** 扫描未翻译段落,交给 IntersectionObserver 等待进入视口 */
 function scan(): number {
   if (!settings || !io) return 0;
+
+  // 救援:有标记但没有译文、也不在跟踪中的节点(虚拟列表摘下再放回、
+  // 或扩展重载前的旧标记),摘掉标记让本轮重新收
+  for (const el of document.querySelectorAll<HTMLElement>("[data-interline-id]")) {
+    const id = Number(el.dataset.interlineId);
+    if (!byId.has(id) && !el.querySelector(":scope > .interline-block")) {
+      delete el.dataset.interlineId;
+    }
+  }
+
   const segments = collectSegments(settings.targetLang);
   for (const seg of segments) {
     byId.set(seg.id, seg);

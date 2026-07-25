@@ -23,7 +23,9 @@ const DIV_SKIP_CLOSEST =
   "a, button, label, [role='button'], [role='tab'], [role='menuitem'], [role='option']";
 
 const MIN_CHARS = 2;
-const MIN_DIV_CHARS = 24; // div 叶子块要求更长,过滤 UI 短文案
+// div 叶子块的下限:主要靠 DIV_SKIP_CLOSEST 挡 UI 文案,这里只兜底;
+// 太高会漏掉短推文("This is mind-blowing" 只有 20 字符)
+const MIN_DIV_CHARS = 12;
 const MAX_CHARS = 3000; // 段落长度上限,防止单段吃掉大量 token
 
 let nextId = 1;
