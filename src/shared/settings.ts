@@ -4,7 +4,7 @@ export const DEFAULT_MODELS: Record<Provider, string> = {
   anthropic: "claude-haiku-4-5",
   openai: "gpt-5-mini",
   grok: "grok-4-fast-non-reasoning",
-  deepseek: "deepseek-chat",
+  deepseek: "deepseek-v4-flash",
   gemini: "gemini-2.5-flash",
 };
 
@@ -47,6 +47,13 @@ export async function getSettings(): Promise<Settings> {
   }
   if (stored.model && !settings.models.anthropic) {
     settings.models.anthropic = stored.model;
+  }
+  // DeepSeek 2026 起废弃了旧模型名,API 只认 v4 系列
+  if (settings.models.deepseek === "deepseek-chat") {
+    settings.models.deepseek = "deepseek-v4-flash";
+  }
+  if (settings.models.deepseek === "deepseek-reasoner") {
+    settings.models.deepseek = "deepseek-v4-pro";
   }
   return settings;
 }

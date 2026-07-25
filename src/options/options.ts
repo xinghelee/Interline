@@ -13,7 +13,7 @@ const MODEL_SUGGESTIONS: Record<Provider, string[]> = {
   anthropic: ["claude-haiku-4-5", "claude-sonnet-5", "claude-opus-4-8"],
   openai: ["gpt-5-mini", "gpt-5.1", "gpt-4o-mini"],
   grok: ["grok-4-fast-non-reasoning", "grok-4"],
-  deepseek: ["deepseek-chat", "deepseek-reasoner"],
+  deepseek: ["deepseek-v4-flash", "deepseek-v4-pro"],
   gemini: ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro"],
 };
 
@@ -23,7 +23,7 @@ const $ = <T extends HTMLElement>(id: string) =>
 const providerEl = $<HTMLSelectElement>("provider");
 const apiKeyEl = $<HTMLInputElement>("apiKey");
 const modelEl = $<HTMLInputElement>("model");
-const modelSuggestionsEl = $<HTMLElement>("modelSuggestions");
+const modelChipsEl = $<HTMLElement>("modelChips");
 const targetLangEl = $<HTMLSelectElement>("targetLang");
 const styleColorEl = $<HTMLSelectElement>("styleColor");
 const underlineEl = $<HTMLInputElement>("underline");
@@ -60,6 +60,7 @@ async function init(): Promise<void> {
     currentProvider = providerEl.value as Provider;
     loadProviderFields();
   });
+  modelEl.addEventListener("input", renderModelChips);
 
   $("save").addEventListener("click", async () => {
     await save();
@@ -98,11 +99,22 @@ function stashProviderFields(): void {
 function loadProviderFields(): void {
   apiKeyEl.value = apiKeys[currentProvider] ?? "";
   modelEl.value = models[currentProvider] || DEFAULT_MODELS[currentProvider];
-  modelSuggestionsEl.replaceChildren(
+  renderModelChips();
+}
+
+function renderModelChips(): void {
+  modelChipsEl.replaceChildren(
     ...MODEL_SUGGESTIONS[currentProvider].map((m) => {
-      const opt = document.createElement("option");
-      opt.value = m;
-      return opt;
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = m;
+      chip.classList.toggle("active", m === modelEl.value.trim());
+      chip.addEventListener("click", () => {
+        modelEl.value = m;
+        renderModelChips();
+      });
+      return chip;
     }),
   );
 }

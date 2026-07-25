@@ -20,6 +20,24 @@
   text-underline-offset: 3px;
 }
 
+/* 排队中的占位:脉动的省略号,译文回来原地替换 */
+.interline-block.interline-pending {
+  opacity: 0.45;
+  animation: interline-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes interline-pulse {
+  50% {
+    opacity: 0.15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interline-block.interline-pending {
+    animation: none;
+  }
+}
+
 html.interline-hide .interline-block {
   display: none;
 }

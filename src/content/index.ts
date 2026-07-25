@@ -7,7 +7,12 @@ import type {
   TranslateBatchResponse,
 } from "../shared/types";
 import { collectSegments, type Segment } from "./scan";
-import { removeAllTranslations, renderTranslation } from "./render";
+import {
+  removeAllTranslations,
+  removePending,
+  renderPending,
+  renderTranslation,
+} from "./render";
 import { setupAdClean } from "./adclean";
 import { translateActiveInput } from "./inputtranslate";
 import {
@@ -15,6 +20,7 @@ import {
   setSelectionEnabled,
   setupSelectionTranslate,
   showSelectionToast,
+  showToast,
 } from "./select";
 import { saveSettings } from "../shared/settings";
 
@@ -45,6 +51,8 @@ const queue: Segment[] = [];
 let inFlight = 0;
 let flushTimer: number | undefined;
 let rescanTimer: number | undefined;
+// 每轮只 toast 一次失败,避免连续失败刷屏
+let errorToasted = false;
 
 chrome.runtime.onMessage.addListener(
   (msg: ContentRequest, _sender, sendResponse) => {
@@ -110,6 +118,7 @@ chrome.runtime.onMessage.addListener(
 async function start(): Promise<void> {
   settings = await getSettings();
   state.error = undefined;
+  errorToasted = false;
 
   // 沿用上次的原文显示偏好
   state.originalShown = settings.showOriginal;
@@ -221,6 +230,9 @@ function enqueue(segments: Segment[]): void {
   queue.push(...segments);
   state.total += segments.length;
   state.state = "translating";
+  if (settings) {
+    for (const seg of segments) renderPending(seg.el, settings);
+  }
   if (flushTimer === undefined) {
     flushTimer = window.setTimeout(() => {
       flushTimer = undefined;
@@ -281,6 +293,11 @@ async function runBatch(batch: Segment[], gen: number): Promise<void> {
   if (!resp?.ok) {
     state.error = resp?.error ?? "翻译请求失败";
     state.completed += batch.length;
+    for (const seg of batch) removePending(seg.el);
+    if (!errorToasted) {
+      errorToasted = true;
+      showToast(`翻译失败:${state.error}`);
+    }
     return;
   }
   for (const seg of batch) {

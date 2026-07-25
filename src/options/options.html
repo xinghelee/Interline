@@ -27,9 +27,9 @@
       </label>
       <label>
         <span>模型</span>
-        <input id="model" type="text" list="modelSuggestions" placeholder="模型 ID,可自由填写" />
-        <datalist id="modelSuggestions"></datalist>
+        <input id="model" type="text" placeholder="模型 ID,可自由填写" autocomplete="off" />
       </label>
+      <div id="modelChips" class="chips"></div>
       <div class="row">
         <button id="test">测试连接</button>
         <span id="testResult"></span>
