@@ -1,9 +1,14 @@
 {
   "manifest_version": 3,
   "name": "Interline 行间",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "双语对照网页翻译:译文长在字里行间。自用 API,无订阅无遥测。",
-  "permissions": ["storage"],
+  "permissions": ["storage", "declarativeNetRequest"],
+  "declarative_net_request": {
+    "rule_resources": [
+      { "id": "ads", "enabled": true, "path": "adrules.json" }
+    ]
+  },
   "host_permissions": [
     "https://api.anthropic.com/*",
     "https://api.openai.com/*",

@@ -6,25 +6,34 @@
 </head>
 <body>
   <header>
-    <span class="logo">行间</span>
-    <span class="sub">Interline</span>
+    <div class="brand">
+      <span class="logo">行间</span>
+      <span class="brand-gloss">Interline</span>
+    </div>
+    <a id="settingsLink" href="#">设置</a>
   </header>
 
   <div id="warn" class="warn hidden">
-    尚未设置 API Key
-    <button id="openOptions">打开设置</button>
+    <span>尚未设置 API Key</span>
+    <button id="openOptions" class="mini">打开设置</button>
   </div>
 
   <div class="actions">
     <button id="translate" class="primary">翻译此页</button>
-    <button id="toggle" class="hidden">隐藏译文</button>
-    <button id="toggleOriginal" class="hidden">隐藏原文(仅译文)</button>
-    <button id="clear" class="hidden">清除译文</button>
+    <div id="progressWrap" class="progress hidden">
+      <div id="progressBar"></div>
+    </div>
+    <div class="actions-row">
+      <button id="toggle" class="hidden">隐藏译文</button>
+      <button id="toggleOriginal" class="hidden">仅译文</button>
+      <button id="clear" class="hidden">清除</button>
+    </div>
   </div>
 
   <label id="siteAutoRow" class="site-auto hidden">
-    <input type="checkbox" id="siteAuto" />
     <span>此站点自动翻译</span>
+    <input type="checkbox" id="siteAuto" />
+    <span class="switch" aria-hidden="true"></span>
   </label>
 
   <div id="status" class="status"></div>
@@ -37,14 +46,14 @@
       rows="2"
       placeholder="输入文本,Enter 翻译(自动中英互译)"
     ></textarea>
-    <button id="quickGo">翻译</button>
+    <div class="quick-actions">
+      <button id="quickGo">翻译</button>
+    </div>
     <div id="quickResultWrap" class="quick-result-wrap hidden">
       <div id="quickResult"></div>
       <button id="quickCopy" class="mini">复制</button>
     </div>
   </div>
-
-  <footer><a id="settingsLink" href="#">设置</a></footer>
 
   <script src="popup.js"></script>
 </body>

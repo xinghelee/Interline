@@ -17,6 +17,8 @@ export const DEFAULT_SETTINGS: Settings = {
   underline: false,
   autoSites: [],
   selectionEnabled: true,
+  showOriginal: true,
+  adBlock: true,
 };
 
 export function activeKey(s: Settings): string {

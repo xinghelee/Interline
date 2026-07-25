@@ -98,3 +98,16 @@ html.interline-hide-original [data-interline-id] > .interline-block {
 .interline-hidden {
   display: none !important;
 }
+
+/* ---- 广告版位遮蔽(保守列表,只动明确的广告容器) ---- */
+
+html.interline-adblock ins.adsbygoogle,
+html.interline-adblock .adsbygoogle,
+html.interline-adblock iframe[id^="google_ads_"],
+html.interline-adblock div[id^="google_ads_"],
+html.interline-adblock [id^="div-gpt-ad"],
+html.interline-adblock [data-ad-slot],
+html.interline-adblock iframe[src*="doubleclick.net"],
+html.interline-adblock iframe[src*="googlesyndication.com"] {
+  display: none !important;
+}

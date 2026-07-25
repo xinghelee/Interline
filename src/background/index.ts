@@ -50,6 +50,24 @@ chrome.runtime.onMessage.addListener(
   },
 );
 
+// 广告屏蔽:按设置启停内置规则表
+async function applyAdBlock(): Promise<void> {
+  const settings = await getSettings();
+  try {
+    await chrome.declarativeNetRequest.updateEnabledRulesets(
+      settings.adBlock
+        ? { enableRulesetIds: ["ads"] }
+        : { disableRulesetIds: ["ads"] },
+    );
+  } catch {
+    // 规则表不可用时忽略
+  }
+}
+void applyAdBlock();
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes["interline:settings"]) void applyAdBlock();
+});
+
 // 快捷键:转发给当前标签页的 content script
 chrome.commands.onCommand.addListener(async (command) => {
   const type =

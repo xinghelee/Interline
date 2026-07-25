@@ -13,6 +13,7 @@ const copies = [
   ["src/popup/popup.css", "dist/popup.css"],
   ["src/options/options.html", "dist/options.html"],
   ["src/options/options.css", "dist/options.css"],
+  ["src/adblock/rules.json", "dist/adrules.json"],
 ];
 for (const [from, to] of copies) cpSync(from, to);
 

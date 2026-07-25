@@ -84,6 +84,7 @@ chrome.runtime.onMessage.addListener(
           state.shown = true;
           document.documentElement.classList.remove("interline-hide");
         }
+        void saveSettings({ showOriginal: state.originalShown });
         sendResponse(state);
         break;
       case "toggleSelection": {
@@ -103,6 +104,13 @@ chrome.runtime.onMessage.addListener(
 async function start(): Promise<void> {
   settings = await getSettings();
   state.error = undefined;
+
+  // 沿用上次的原文显示偏好
+  state.originalShown = settings.showOriginal;
+  document.documentElement.classList.toggle(
+    "interline-hide-original",
+    !state.originalShown,
+  );
 
   ensureObservers();
   const found = scan();
@@ -266,9 +274,10 @@ async function runBatch(batch: Segment[], gen: number): Promise<void> {
   }
 }
 
-// 初始化:划词翻译 + 站点自动翻译
+// 初始化:划词翻译 + 广告版位遮蔽 + 站点自动翻译
 void (async () => {
   const s = await getSettings();
   setupSelectionTranslate(s.selectionEnabled);
+  document.documentElement.classList.toggle("interline-adblock", s.adBlock);
   if (s.autoSites.includes(location.hostname)) void start();
 })();

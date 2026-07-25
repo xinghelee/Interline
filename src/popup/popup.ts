@@ -17,6 +17,8 @@ const toggleOriginalBtn = $<HTMLButtonElement>("toggleOriginal");
 const clearBtn = $<HTMLButtonElement>("clear");
 const statusEl = $("status");
 const usageEl = $("usage");
+const progressWrap = $("progressWrap");
+const progressBar = $("progressBar");
 const siteAutoRow = $("siteAutoRow");
 const siteAutoCheck = $<HTMLInputElement>("siteAuto");
 const quickInput = $<HTMLTextAreaElement>("quickInput");
@@ -124,9 +126,13 @@ function applyState(state: ContentState): void {
   toggleOriginalBtn.classList.toggle("hidden", !hasBlocks);
   clearBtn.classList.toggle("hidden", !hasBlocks);
   toggleBtn.textContent = state.shown ? "隐藏译文" : "显示译文";
-  toggleOriginalBtn.textContent = state.originalShown
-    ? "隐藏原文(仅译文)"
-    : "显示原文";
+  toggleOriginalBtn.textContent = state.originalShown ? "仅译文" : "显示原文";
+
+  progressWrap.classList.toggle("hidden", !busy);
+  progressBar.style.width =
+    busy && state.total > 0
+      ? `${Math.round((state.completed / state.total) * 100)}%`
+      : "0%";
 
   statusEl.classList.toggle("error", Boolean(state.error));
   statusEl.textContent = state.error

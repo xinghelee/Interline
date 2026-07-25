@@ -28,6 +28,7 @@ const targetLangEl = $<HTMLSelectElement>("targetLang");
 const styleColorEl = $<HTMLSelectElement>("styleColor");
 const underlineEl = $<HTMLInputElement>("underline");
 const selectionEnabledEl = $<HTMLInputElement>("selectionEnabled");
+const adBlockEl = $<HTMLInputElement>("adBlock");
 const cacheInfoEl = $("cacheInfo");
 const testResultEl = $("testResult");
 const saveResultEl = $("saveResult");
@@ -50,6 +51,7 @@ async function init(): Promise<void> {
   styleColorEl.value = settings.styleColor;
   underlineEl.checked = settings.underline;
   selectionEnabledEl.checked = settings.selectionEnabled;
+  adBlockEl.checked = settings.adBlock;
   loadProviderFields();
   void refreshCacheInfo();
 
@@ -115,6 +117,7 @@ async function save(): Promise<void> {
     styleColor: styleColorEl.value,
     underline: underlineEl.checked,
     selectionEnabled: selectionEnabledEl.checked,
+    adBlock: adBlockEl.checked,
   });
 }
 

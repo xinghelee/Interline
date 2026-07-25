@@ -15,6 +15,10 @@ export interface Settings {
   autoSites: string[];
   /** 划词翻译开关 */
   selectionEnabled: boolean;
+  /** 是否显示原文(关 = 仅译文模式),记住用户上次的选择 */
+  showOriginal: boolean;
+  /** 屏蔽常见广告(内置域名规则 + 版位遮蔽) */
+  adBlock: boolean;
 }
 
 export interface SegmentItem {
