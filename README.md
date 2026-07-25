@@ -1,6 +1,11 @@
 # Interline(行间)
 
-个人用双语对照浏览器翻译扩展:译文长在字里行间。支持 Claude / OpenAI / Grok / DeepSeek / Gemini,自带 API Key,无订阅无遥测。设计与路线图见 [PLAN.md](./PLAN.md)。
+个人用双语对照浏览器翻译扩展:译文长在字里行间。支持 Claude / OpenAI / Grok / DeepSeek / Gemini 及自定义 OpenAI 兼容端点,自带 API Key,无订阅无遥测。设计与路线图见 [PLAN.md](./PLAN.md)。
+
+<p align="center">
+  <img src="docs/popup.png" width="330" alt="Popup:翻译此页、站点自动翻译、当日用量、快捷翻译" />
+  <img src="docs/options.png" width="330" alt="设置页:翻译服务、模型、术语表、样式、缓存" />
+</p>
 
 ## 开发
 
@@ -28,5 +33,6 @@ npm run typecheck
 - [x] popup 视觉重设计(双语 wordmark、紧凑操作行、拨动开关、进度行)
 - [x] 广告屏蔽:declarativeNetRequest 内置常见广告域名规则 + 版位遮蔽 + X 推广推文/Reddit 推广帖清理,设置页可关
 - [x] M4:Twitter/X 与 Reddit 适配(通用 div 叶子块方案实测覆盖)+ 输入框翻译(Alt+E 原地替换,写英文邮件/推文)
+- [x] v0.4:自定义 OpenAI 兼容端点(Ollama/中转站,key 可空)+ 仅译文偏好按站点记忆 + 失败段落一键重试 + 术语表 + 页面标题上下文 + Claude prompt caching
 - [x] 多引擎:Claude 原生 + OpenAI 兼容通道(OpenAI / Grok / DeepSeek / Gemini),按服务商记忆 Key 和模型
 - [ ] M4(可选):Twitter/Reddit 虚拟列表适配、输入框翻译
