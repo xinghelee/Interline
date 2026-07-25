@@ -73,21 +73,57 @@ export async function pingOpenAICompat(
   );
 }
 
-/** 有的模型会包 ```json 围栏或加前后缀,尽量捞出 JSON 主体 */
+/** 尽量捞出 JSON 主体:剥 ``` 围栏、取花括号段、转义字符串内的裸换行
+    (json_object 模式下模型常把译文换行原样放进字符串,产生非法 JSON) */
 function parseTranslations(text: string): {
   translations?: { id: number; text: string }[];
 } {
-  try {
-    return JSON.parse(text);
-  } catch {
-    const match = text.match(/\{[\s\S]*\}/);
-    if (match) {
-      try {
-        return JSON.parse(match[0]);
-      } catch {
-        /* fallthrough */
-      }
+  const trimmed = text.trim();
+  const candidates = [trimmed];
+  const fence = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fence) candidates.push(fence[1].trim());
+  const braces = trimmed.match(/\{[\s\S]*\}/);
+  if (braces) candidates.push(braces[0]);
+  for (const c of [...candidates]) candidates.push(escapeRawControlChars(c));
+
+  for (const c of candidates) {
+    try {
+      return JSON.parse(c);
+    } catch {
+      /* 试下一个 */
     }
-    throw new Error("无法解析模型返回的 JSON");
   }
+  throw new Error(`无法解析模型返回的 JSON:${trimmed.slice(0, 100)}`);
+}
+
+function escapeRawControlChars(json: string): string {
+  let out = "";
+  let inStr = false;
+  let escaped = false;
+  for (const ch of json) {
+    if (!inStr) {
+      if (ch === '"') inStr = true;
+      out += ch;
+      continue;
+    }
+    if (escaped) {
+      out += ch;
+      escaped = false;
+    } else if (ch === "\\") {
+      out += ch;
+      escaped = true;
+    } else if (ch === '"') {
+      inStr = false;
+      out += ch;
+    } else if (ch === "\n") {
+      out += "\\n";
+    } else if (ch === "\r") {
+      out += "\\r";
+    } else if (ch === "\t") {
+      out += "\\t";
+    } else {
+      out += ch;
+    }
+  }
+  return out;
 }

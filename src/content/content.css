@@ -44,9 +44,10 @@ html.interline-hide .interline-block {
 
 /* 仅译文模式:把已翻译段落的原文字号压 0(译文块字号已内联锁定)。
    按钮等交互控件除外,否则 X 的 Follow 按钮会塌成实心圆 */
-html.interline-hide-original [data-interline-id]:has(> .interline-block),
 html.interline-hide-original
-  [data-interline-id]:has(> .interline-block)
+  [data-interline-id]:has(> .interline-block:not(.interline-pending)),
+html.interline-hide-original
+  [data-interline-id]:has(> .interline-block:not(.interline-pending))
   *:not(.interline-block):not(.interline-block *):not(
     :is(button, [role="button"], input, select, textarea)
   ):not(:is(button, [role="button"], input, select, textarea) *) {
