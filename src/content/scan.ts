@@ -23,7 +23,9 @@ const SITE_SKIP: { pattern: RegExp; selector: string }[] = [
   {
     pattern: /(^|\.)(x|twitter)\.com$/,
     selector:
-      "[data-testid='sidebarColumn'], [data-testid='UserCell'], [data-testid='trend']",
+      "[data-testid='sidebarColumn'], [data-testid='UserCell'], [data-testid='trend'], " +
+      // 发推框:编辑器占位符是 contenteditable 旁边的独立 div,单独排除
+      "[data-testid^='tweetTextarea'], [data-testid='toolBar']",
   },
 ];
 
