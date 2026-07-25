@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>Interline 设置</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <main>
+    <h1>行间 <span class="sub">Interline 设置</span></h1>
+
+    <section>
+      <h2>API</h2>
+      <label>
+        <span>翻译服务</span>
+        <select id="provider">
+          <option value="anthropic">Claude(Anthropic)</option>
+          <option value="openai">OpenAI</option>
+          <option value="grok">Grok(xAI)</option>
+          <option value="deepseek">DeepSeek</option>
+          <option value="gemini">Gemini(Google)</option>
+        </select>
+      </label>
+      <label>
+        <span>API Key</span>
+        <input id="apiKey" type="password" placeholder="当前服务商的 API Key" autocomplete="off" />
+      </label>
+      <label>
+        <span>模型</span>
+        <input id="model" type="text" list="modelSuggestions" placeholder="模型 ID,可自由填写" />
+        <datalist id="modelSuggestions"></datalist>
+      </label>
+      <div class="row">
+        <button id="test">测试连接</button>
+        <span id="testResult"></span>
+      </div>
+    </section>
+
+    <section>
+      <h2>翻译</h2>
+      <label>
+        <span>目标语言</span>
+        <select id="targetLang">
+          <option value="简体中文">简体中文</option>
+          <option value="繁體中文">繁體中文</option>
+          <option value="English">English</option>
+          <option value="日本語">日本語</option>
+        </select>
+      </label>
+      <label class="inline">
+        <input id="selectionEnabled" type="checkbox" />
+        <span>启用划词翻译(选中文本浮出翻译按钮,Alt+S 开关)</span>
+      </label>
+    </section>
+
+    <section>
+      <h2>样式</h2>
+      <label>
+        <span>译文颜色</span>
+        <select id="styleColor">
+          <option value="">默认(继承原文,略微淡化)</option>
+          <option value="#8a8a8a">灰色</option>
+          <option value="#2563eb">蓝色</option>
+          <option value="#7c5c3e">棕色</option>
+          <option value="#059669">绿色</option>
+        </select>
+      </label>
+      <label class="inline">
+        <input id="underline" type="checkbox" />
+        <span>译文加虚线下划线</span>
+      </label>
+    </section>
+
+    <section>
+      <h2>缓存</h2>
+      <div class="row">
+        <span id="cacheInfo" class="muted">统计中…</span>
+        <button id="clearCache">清空缓存</button>
+      </div>
+    </section>
+
+    <div class="row">
+      <button id="save" class="primary">保存</button>
+      <span id="saveResult"></span>
+    </div>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>

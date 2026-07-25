@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Interline 行间",
+  "version": "0.2.0",
+  "description": "双语对照网页翻译:译文长在字里行间。自用 API,无订阅无遥测。",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://api.anthropic.com/*",
+    "https://api.openai.com/*",
+    "https://api.x.ai/*",
+    "https://api.deepseek.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Interline 行间"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "commands": {
+    "toggle-translate": {
+      "suggested_key": { "default": "Alt+T" },
+      "description": "翻译此页 / 显示隐藏译文"
+    },
+    "toggle-selection": {
+      "suggested_key": { "default": "Alt+S" },
+      "description": "开关划词翻译"
+    }
+  }
+}

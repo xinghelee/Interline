@@ -1,0 +1,87 @@
+.interline-block {
+  display: block;
+  margin-top: 0.35em;
+  opacity: 0.82;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: normal;
+  user-select: text;
+  animation: interline-fade 0.18s ease-out;
+}
+
+@keyframes interline-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.interline-underline {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+html.interline-hide .interline-block {
+  display: none;
+}
+
+/* ---- 划词翻译 ---- */
+
+.interline-select-btn {
+  position: fixed;
+  z-index: 2147483647;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #7c5c3e;
+  color: #fff;
+  font: 600 13px/28px system-ui, -apple-system, sans-serif;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.interline-select-btn:hover {
+  transform: scale(1.08);
+}
+
+.interline-bubble {
+  position: fixed;
+  z-index: 2147483647;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2328;
+  font: 13px/1.5 system-ui, -apple-system, sans-serif;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  white-space: pre-wrap;
+  word-break: break-word;
+  user-select: text;
+}
+
+.interline-toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font: 13px/1.4 system-ui, -apple-system, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  .interline-bubble {
+    background: #2a2a2e;
+    color: #e6e6e6;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.interline-hidden {
+  display: none !important;
+}
