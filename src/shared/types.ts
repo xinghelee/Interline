@@ -59,11 +59,14 @@ export type ContentRequest =
   | { type: "removeAll" }
   | { type: "getState" }
   | { type: "toggleTranslate" }
-  | { type: "toggleSelection" };
+  | { type: "toggleSelection" }
+  | { type: "toggleOriginal" };
 
 export interface ContentState {
   state: "idle" | "translating" | "done";
   shown: boolean;
+  /** 是否显示原文(关 = 仅译文模式) */
+  originalShown: boolean;
   total: number;
   completed: number;
   error?: string;

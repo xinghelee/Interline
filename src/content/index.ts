@@ -27,6 +27,7 @@ const FLUSH_DEBOUNCE_MS = 200;
 const state: ContentState = {
   state: "idle",
   shown: true,
+  originalShown: true,
   total: 0,
   completed: 0,
   host: location.hostname,
@@ -72,6 +73,19 @@ chrome.runtime.onMessage.addListener(
         }
         sendResponse(state);
         break;
+      case "toggleOriginal":
+        state.originalShown = !state.originalShown;
+        document.documentElement.classList.toggle(
+          "interline-hide-original",
+          !state.originalShown,
+        );
+        // 原文译文都隐藏会导致页面空白,隐藏原文时强制显示译文
+        if (!state.originalShown && !state.shown) {
+          state.shown = true;
+          document.documentElement.classList.remove("interline-hide");
+        }
+        sendResponse(state);
+        break;
       case "toggleSelection": {
         const next = !isSelectionEnabled();
         setSelectionEnabled(next);
@@ -112,8 +126,10 @@ function stop(): void {
   rescanTimer = undefined;
 
   removeAllTranslations();
+  document.documentElement.classList.remove("interline-hide-original");
   state.state = "idle";
   state.shown = true;
+  state.originalShown = true;
   state.total = 0;
   state.completed = 0;
   state.error = undefined;

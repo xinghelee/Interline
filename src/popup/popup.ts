@@ -13,6 +13,7 @@ const $ = <T extends HTMLElement>(id: string) =>
 const warnEl = $("warn");
 const translateBtn = $<HTMLButtonElement>("translate");
 const toggleBtn = $<HTMLButtonElement>("toggle");
+const toggleOriginalBtn = $<HTMLButtonElement>("toggleOriginal");
 const clearBtn = $<HTMLButtonElement>("clear");
 const statusEl = $("status");
 const usageEl = $("usage");
@@ -95,6 +96,10 @@ async function init(): Promise<void> {
     const next = await sendToContent({ type: "toggleShow" });
     if (next) applyState(next);
   });
+  toggleOriginalBtn.addEventListener("click", async () => {
+    const next = await sendToContent({ type: "toggleOriginal" });
+    if (next) applyState(next);
+  });
   clearBtn.addEventListener("click", async () => {
     const next = await sendToContent({ type: "removeAll" });
     if (next) applyState(next);
@@ -116,8 +121,12 @@ function applyState(state: ContentState): void {
 
   const hasBlocks = state.total > 0 && state.state !== "idle";
   toggleBtn.classList.toggle("hidden", !hasBlocks);
+  toggleOriginalBtn.classList.toggle("hidden", !hasBlocks);
   clearBtn.classList.toggle("hidden", !hasBlocks);
   toggleBtn.textContent = state.shown ? "隐藏译文" : "显示译文";
+  toggleOriginalBtn.textContent = state.originalShown
+    ? "隐藏原文(仅译文)"
+    : "显示原文";
 
   statusEl.classList.toggle("error", Boolean(state.error));
   statusEl.textContent = state.error

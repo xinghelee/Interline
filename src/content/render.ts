@@ -11,6 +11,10 @@ export function renderTranslation(
   node.className = "interline-block";
   node.dataset.interlineFor = el.dataset.interlineId ?? "";
   node.textContent = text;
+  // 记录原文字号并内联锁定(!important):仅译文模式把原文 font-size 压 0,译文不受连累
+  const cs = getComputedStyle(el);
+  node.style.setProperty("font-size", cs.fontSize, "important");
+  node.style.setProperty("line-height", cs.lineHeight, "important");
   if (settings.styleColor) {
     node.style.color = settings.styleColor;
     node.style.opacity = "1";

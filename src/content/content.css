@@ -24,6 +24,19 @@ html.interline-hide .interline-block {
   display: none;
 }
 
+/* 仅译文模式:把已翻译段落的原文字号压 0(译文块字号已内联锁定) */
+html.interline-hide-original [data-interline-id]:has(> .interline-block),
+html.interline-hide-original
+  [data-interline-id]:has(> .interline-block)
+  *:not(.interline-block):not(.interline-block *) {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+html.interline-hide-original [data-interline-id] > .interline-block {
+  margin-top: 0;
+}
+
 /* ---- 划词翻译 ---- */
 
 .interline-select-btn {
